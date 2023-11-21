@@ -19,6 +19,16 @@ document.addEventListener('DOMContentLoaded', function () {
         const cep = document.getElementById('cep').value;
         const cidade = document.getElementById('cidade').value;
 
+        // Obter a lista de clientes do localStorage se existir
+        let listaClientes = JSON.parse(localStorage.getItem('clientes')) || [];
+
+        // Obter o ID do cliente para edição do localStorage
+        const clienteParaEditarID = localStorage.getItem('clienteParaEditarID');
+
+        // Verificar se o cliente para edição existe na lista pelo ID
+        const clienteParaEditar = listaClientes.find(cliente => cliente.id === clienteParaEditarID);
+
+
         // Validar os campos com regex
         const dataNascimentoRegex = /^\d{2}\/\d{2}\/\d{4}$/;
         const cepRegex = /^\d{5}-\d{3}$/;
@@ -54,30 +64,57 @@ document.addEventListener('DOMContentLoaded', function () {
             // Gerar um ID único para o novo cliente
             const id = Date.now().toString();
 
-            // Criar um objeto com os dados do cliente
-            const cliente = {
-                id,
-                nome,
-                sobrenome,
-                dataNascimento,
-                tipoCliente,
-                endereco,
-                numero,
-                cep,
-                cidade
-            };
-    
             // Obter a lista de clientes do localStorage se existir
             let listaClientes = JSON.parse(localStorage.getItem('clientes')) || [];
-    
-            // Adicionar o novo cliente à lista
-            listaClientes.push(cliente);
-    
+
+            // Obter o ID do cliente para edição do localStorage
+            const clienteParaEditarID = localStorage.getItem('clienteParaEditarID');
+
+            const clienteParaEditar = listaClientes.find(cliente => cliente.id === clienteParaEditarID);
+
+            // Validar se clienteParaEditar está definido antes de acessar a propriedade 'id'
+            const idParaAtualizar = clienteParaEditar ? clienteParaEditar.id : null;
+
+            // Verificar se o cliente já existe na lista pelo ID
+            const clienteExistente = listaClientes.find(cliente => cliente.id === idParaAtualizar);
+
+            if (clienteExistente) {
+                // Atualizar os dados do cliente existente
+                clienteExistente.nome = nome;
+                clienteExistente.sobrenome = sobrenome;
+                clienteExistente.dataNascimento = dataNascimento;
+                clienteExistente.tipoCliente = tipoCliente;
+                clienteExistente.endereco = endereco;
+                clienteExistente.numero = numero;
+                clienteExistente.cep = cep;
+                clienteExistente.cidade = cidade;
+            } else {
+                // Criar um objeto com os dados do cliente
+                const cliente = {
+                    id,
+                    nome,
+                    sobrenome,
+                    dataNascimento,
+                    tipoCliente,
+                    endereco,
+                    numero,
+                    cep,
+                    cidade
+                };
+
+                // Adicionar o novo cliente à lista
+                listaClientes.push(cliente);
+            }
+
             // Salvar a lista atualizada no localStorage
             localStorage.setItem('clientes', JSON.stringify(listaClientes));
-    
+
             // Limpar os campos do formulário após adicionar o cliente
             form.reset();
+
+            // Remover os dados do cliente para edição no localStorage após a atualização
+            localStorage.removeItem('clienteParaEditar');
+            localStorage.removeItem('clienteParaEditarID');
 
             // Lista os clientes no console
             console.log(listaClientes);
@@ -104,6 +141,12 @@ document.addEventListener('DOMContentLoaded', function () {
     // Chama a função para preencher os campos ao carregar a página
     preencherCamposEdicao();
 
+    const clienteParaEditarID = localStorage.getItem('clienteParaEditarID');
+    if (clienteParaEditarID) {
+        // Preenche os campos com os dados do cliente para edição
+        preencherCamposEdicao();
+    }
+
 
     /* FUNÇÕES */
 
@@ -122,10 +165,11 @@ document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('numero').value = clienteParaEditar.numero;
             document.getElementById('cep').value = clienteParaEditar.cep;
             document.getElementById('cidade').value = clienteParaEditar.cidade;
-        }
 
-        // Limpa os dados do cliente do localStorage
-        localStorage.removeItem('clienteParaEditar');
+            // Armazena o ID do cliente para edição no localStorage
+            const clienteParaEditarID = clienteParaEditar.id;
+            localStorage.setItem('clienteParaEditarID', clienteParaEditarID);
+        }
     }
 
     // Arrow Function para limpar todos os inputs

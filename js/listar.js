@@ -41,15 +41,16 @@ document.addEventListener('DOMContentLoaded', function () {
         atualizarTabela();
     }
 
-    window.editarCliente = function(id) {
+    window.editarCliente = function (id) {
         // Recupera a lista de clientes do localStorage
         const listaClientes = JSON.parse(localStorage.getItem('clientes')) || [];
     
         // Obtém o cliente pelo índice
-        const clienteParaEditar = listaClientes[id]; 
+        const clienteParaEditar = listaClientes[id];
     
-        // Armazena os dados do cliente no localStorage
+        // Armazena os dados do cliente e o ID para edição no localStorage
         localStorage.setItem('clienteParaEditar', JSON.stringify(clienteParaEditar));
+        localStorage.setItem('clienteParaEditarID', clienteParaEditar.id);
     
         // Redireciona para a página index.html
         window.location.href = "index.html";
